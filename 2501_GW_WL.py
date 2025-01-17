@@ -113,4 +113,5 @@ else:
     with col1:
         st.image("FIG2.png")
     with col2:
-        st.video("media.mp4", caption="📍 위치도 및 염분 분포도")
+        st.video("media.mp4")
+#,caption="📍 위치도 및 염분 분포도")
