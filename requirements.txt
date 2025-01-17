@@ -7,3 +7,5 @@ scikit-learn
 plotly
 xgboost
 Pillow
+matplotlib
+seaborn
