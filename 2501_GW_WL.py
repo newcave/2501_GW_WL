@@ -44,17 +44,16 @@ if uploaded_file or use_default:
     else:
         data = load_default_data()
     
-    # '계측수위' 컬럼 자동 탐지
-    possible_wl_columns = [col for col in data.columns if '수위' in col or 'WL' in col]
-    if possible_wl_columns:
-        wl_column = possible_wl_columns[0]
-        data = data.sort_values('Datetime').reset_index(drop=True)
+    # '계측수위' 컬럼 고정 사용
+    wl_column = '계측수위'
+    if wl_column in data.columns:
+        data = data.sort_values(wl_column).reset_index(drop=True)
         st.success(f"✅ 사용 컬럼: {wl_column}")
     else:
-        st.error("❌ 데이터에 '수위' 또는 'WL' 관련 컬럼이 없습니다. 업로드한 데이터를 확인하세요.")
+        st.error("❌ 데이터에 '계측수위' 컬럼이 없습니다. 업로드한 데이터를 확인하세요.")
         st.stop()
 
-    with st.expander("🔍 Raw 데이터 보기", expanded=False):
+    with st.expander("🔍 Raw 데이터 보기", expanded=True):
         st.write(data)
         st.write(f"📋 **데이터 컬럼명:** {list(data.columns)}")
     
@@ -66,11 +65,31 @@ if uploaded_file or use_default:
     st.subheader("🎯 예측변수 선택")
     target_var = st.selectbox("✅ 예측할 변수 선택:", options=list(data.columns), index=list(data.columns).index(wl_column))
 
+    # 🔒 변수 설정 완료 버튼 추가
+    if st.button("🚀 변수 설정 완료"):
+        with st.expander("📌 선택한 변수 보기", expanded=False):
+            st.write(f"✅ **선택한 독립변수:** {independent_vars}")
+            st.write(f"🎯 **예측 변수:** {target_var}")
+            st.write(f"⏳ **리드 타임:** {lead_time}일, 🔍 **룩백 기간:** {look_back}일, 🛠️ **Estimator 수:** {n_estimators}")
+        
+        # 📊 EDA 시각화
+        st.subheader("🔎 기본 EDA")
+        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+        for i, var in enumerate(independent_vars[:3]):
+            sns.histplot(data[var], kde=True, bins=30, ax=axes[i])
+            axes[i].set_title(f'{var} Distribution')
+        st.pyplot(fig)
+        
+        fig_corr, ax_corr = plt.subplots(figsize=(8, 6))
+        sns.heatmap(data[independent_vars + [target_var]].corr(), annot=True, cmap='coolwarm', ax=ax_corr)
+        ax_corr.set_title('Feature Correlation Heatmap')
+        st.pyplot(fig_corr)
+
     # 🤖 모델 학습 및 예측
     if st.button("📊 모델 실행"):
         X = data[independent_vars].apply(pd.to_numeric, errors='coerce').dropna()
         y = pd.to_numeric(data[target_var], errors='coerce').loc[X.index].dropna()
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
         model = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
         model.fit(X_train, y_train)
 
