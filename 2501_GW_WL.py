@@ -53,7 +53,7 @@ if uploaded_file or use_default:
         st.error("❌ 데이터에 '계측수위' 컬럼이 없습니다. 업로드한 데이터를 확인하세요.")
         st.stop()
 
-    with st.expander("🔍 Raw 데이터 보기", expanded=False):
+    with st.expander("🔍 Raw 데이터 보기", expanded=True):
         st.write(data)
         st.write(f"📋 **데이터 컬럼명:** {list(data.columns)}")
     
@@ -64,6 +64,26 @@ if uploaded_file or use_default:
     # 🎯 예측변수 선택
     st.subheader("🎯 예측변수 선택")
     target_var = st.selectbox("✅ 예측할 변수 선택:", options=list(data.columns), index=list(data.columns).index(wl_column))
+
+    # 🔒 변수 설정 완료 버튼 추가
+    if st.button("🚀 변수 설정 완료"):
+        with st.expander("📌 선택한 변수 보기", expanded=False):
+            st.write(f"✅ **선택한 독립변수:** {independent_vars}")
+            st.write(f"🎯 **예측 변수:** {target_var}")
+            st.write(f"⏳ **리드 타임:** {lead_time}일, 🔍 **룩백 기간:** {look_back}일, 🛠️ **Estimator 수:** {n_estimators}")
+        
+        # 📊 EDA 시각화
+        st.subheader("🔎 기본 EDA")
+        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+        for i, var in enumerate(independent_vars[:3]):
+            sns.histplot(data[var], kde=True, bins=30, ax=axes[i])
+            axes[i].set_title(f'{var} Distribution')
+        st.pyplot(fig)
+        
+        fig_corr, ax_corr = plt.subplots(figsize=(8, 6))
+        sns.heatmap(data[independent_vars + [target_var]].corr(), annot=True, cmap='coolwarm', ax=ax_corr)
+        ax_corr.set_title('Feature Correlation Heatmap')
+        st.pyplot(fig_corr)
 
     # 🤖 모델 학습 및 예측
     if st.button("📊 모델 실행"):
