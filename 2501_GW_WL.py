@@ -59,10 +59,12 @@ if uploaded_file or use_default:
         index=0
     )
     
-    # 데이터 및 설정 확인
-    st.write(f"선택한 독립변수: {independent_vars}")
-    st.write(f"예측 변수: {target_var}")
-    st.write(f"리드 타임: {lead_time}일, 룩백 기간: {look_back}일, Estimator 수: {n_estimators}")
+    # 변수 설정 완료 버튼 추가
+    if st.button("변수 설정 완료"):
+        with st.expander("선택한 변수 보기", expanded=False):
+            st.write(f"선택한 독립변수: {independent_vars}")
+            st.write(f"예측 변수: {target_var}")
+            st.write(f"리드 타임: {lead_time}일, 룩백 기간: {look_back}일, Estimator 수: {n_estimators}")
     
     # 모델 학습 및 예측
     if st.button("모델 실행"):
@@ -90,4 +92,4 @@ if uploaded_file or use_default:
         st.write(f"RMSE (Root Mean Squared Error): {rmse:.4f}")
         st.line_chart(pd.DataFrame({"실제값": y_test.values, "예측값": y_pred}, index=y_test.index))
 else:
-    st.info("좌측 사이드바에서 데이터를 업로드하거나 기본 데이터를 선택하세요.")
+    st.info("K-water AI LAB x Groundwater Research Team Collaboration.")
