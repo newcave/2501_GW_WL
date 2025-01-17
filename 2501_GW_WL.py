@@ -8,13 +8,13 @@ import numpy as np
 # 📂 파일 업로드 및 데이터 로딩
 @st.cache_data
 def load_data(file):
-    data = pd.read_excel(file)
+    data = pd.read_excel(file, header=1)  # 두 번째 행을 컬럼명으로 사용
     return data
 
 # 📄 기본 파일 로딩 함수
 @st.cache_data
 def load_default_data():
-    data = pd.read_excel("GW_001.xlsx")
+    data = pd.read_excel("GW_001.xlsx", header=1)  # 두 번째 행을 컬럼명으로 사용
     return data
 
 # ⚙️ 사이드바 설정
@@ -44,20 +44,20 @@ if uploaded_file or use_default:
         st.write(data)
         st.write(f"📋 **데이터 컬럼명:** {list(data.columns)}")
     
-    # 📌 독립변수 선택 (기본값: EC, Temperature, WL)
+    # 📌 독립변수 선택 (기본값: 수온, 전도도, 계측수위)
     st.subheader("📈 독립변수 선택")
     independent_vars = st.multiselect(
         "✅ 사용할 독립변수 선택:",
         options=list(data.columns),
-        default=[col for col in ["EC", "Temperature", "WL"] if col in data.columns]
+        default=[col for col in ["수온", "전도도", "계측수위"] if col in data.columns]
     )
     
-    # 🎯 예측변수 선택 (기본값: WL)
+    # 🎯 예측변수 선택 (기본값: 계측수위)
     st.subheader("🎯 예측변수 선택")
     target_var = st.selectbox(
         "✅ 예측할 변수 선택:",
         options=list(data.columns),
-        index=list(data.columns).index("WL") if "WL" in data.columns else 0
+        index=list(data.columns).index("계측수위") if "계측수위" in data.columns else 0
     )
     
     # 🔒 변수 설정 완료 버튼 추가
