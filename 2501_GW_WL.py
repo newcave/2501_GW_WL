@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
@@ -68,40 +70,47 @@ if uploaded_file or use_default:
             st.write(f"✅ **선택한 독립변수:** {independent_vars}")
             st.write(f"🎯 **예측 변수:** {target_var}")
             st.write(f"⏳ **리드 타임:** {lead_time}일, 🔍 **룩백 기간:** {look_back}일, 🛠️ **Estimator 수:** {n_estimators}")
+        
+        # 📊 EDA 시각화
+        st.subheader("🔎 기본 EDA")
+        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+        sns.histplot(data[independent_vars[0]], kde=True, bins=30, ax=axes[0])
+        axes[0].set_title(f'{independent_vars[0]} Distribution')
+        
+        sns.histplot(data[independent_vars[1]], kde=True, bins=30, ax=axes[1])
+        axes[1].set_title(f'{independent_vars[1]} Distribution')
+        
+        sns.histplot(data[independent_vars[2]], kde=True, bins=30, ax=axes[2])
+        axes[2].set_title(f'{independent_vars[2]} Distribution')
+        
+        st.pyplot(fig)
+        
+        fig_corr, ax_corr = plt.subplots(figsize=(8, 6))
+        sns.heatmap(data[independent_vars + [target_var]].corr(), annot=True, cmap='coolwarm', ax=ax_corr)
+        ax_corr.set_title('Feature Correlation Heatmap')
+        st.pyplot(fig_corr)
     
     # 🤖 모델 학습 및 예측
     if st.button("📊 모델 실행"):
-        # 컬럼 존재 여부 확인
         missing_cols = [col for col in independent_vars if col not in data.columns]
         if missing_cols:
             st.error(f"❌ 선택한 독립변수 {missing_cols}가 데이터에 존재하지 않습니다.")
         else:
-            # 🧹 결측치 및 데이터 타입 처리
             X = data[independent_vars].apply(pd.to_numeric, errors='coerce').dropna()
             y = pd.to_numeric(data[target_var], errors='coerce').loc[X.index].dropna()
-            
-            # 🔀 데이터 분할
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-            
-            # 🌳 Random Forest 모델 학습
             model = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
             model.fit(X_train, y_train)
-            
-            # 📈 예측 및 성능 평가
             y_pred = model.predict(X_test)
             mse = mean_squared_error(y_test, y_pred)
             rmse = np.sqrt(mse)
-            
-            # 📝 결과 출력
             st.subheader("📉 모델 예측 결과")
             st.write(f"📊 **RMSE (Root Mean Squared Error):** {rmse:.4f}")
             st.line_chart(pd.DataFrame({"✅ 실제값": y_test.values, "📈 예측값": y_pred}, index=y_test.index))
 else:
     st.info("💡 **K-water AI LAB x Groundwater Research Team Collaboration.**")
-
-    # 📊 초기 화면 레이아웃 설정
     col1, col2 = st.columns(2)
     with col1:
-        st.image("FIG2.png", caption="📍 위치도 및 염분 분포도")
+        st.image("fig1.png", caption="📍 위치도 및 염분 분포도")
     with col2:
         st.video("media.mp4")
