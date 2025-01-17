@@ -74,8 +74,9 @@ if uploaded_file or use_default:
         if missing_cols:
             st.error(f"❌ 선택한 독립변수 {missing_cols}가 데이터에 존재하지 않습니다.")
         else:
-            X = data[independent_vars].dropna()
-            y = data[target_var].loc[X.index]
+            # 🧹 결측치 및 데이터 타입 처리
+            X = data[independent_vars].apply(pd.to_numeric, errors='coerce').dropna()
+            y = pd.to_numeric(data[target_var], errors='coerce').loc[X.index].dropna()
             
             # 🔀 데이터 분할
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
