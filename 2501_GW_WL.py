@@ -37,9 +37,6 @@ look_back = st.sidebar.slider("🔍 룩백 기간 (과거 데이터 사용 기�
 # 🔧 하이퍼파라미터 설정
 n_estimators = st.sidebar.slider("🛠️ # of Estimators (하이퍼파라미터)", min_value=10, max_value=500, step=10, value=100)
 
-# 🧹 전처리 설정
-water_depth_threshold = st.sidebar.number_input("🌊 수위 임계값 설정 (기본값: 0.1m)", min_value=0.0, value=0.1, step=0.1)
-
 # 📊 데이터 로딩 및 출력
 if uploaded_file or use_default:
     if uploaded_file:
@@ -51,8 +48,8 @@ if uploaded_file or use_default:
     possible_wl_columns = [col for col in data.columns if '수위' in col or 'WL' in col]
     if possible_wl_columns:
         wl_column = possible_wl_columns[0]
-        data = data[data[wl_column] > water_depth_threshold].sort_values('Datetime').reset_index(drop=True)
-        st.success(f"✅ 수위 {water_depth_threshold}m 이하 데이터를 제거하였습니다. (사용 컬럼: {wl_column})")
+        data = data.sort_values('Datetime').reset_index(drop=True)
+        st.success(f"✅ 사용 컬럼: {wl_column}")
     else:
         st.error("❌ 데이터에 '수위' 또는 'WL' 관련 컬럼이 없습니다. 업로드한 데이터를 확인하세요.")
         st.stop()
@@ -73,7 +70,7 @@ if uploaded_file or use_default:
     if st.button("📊 모델 실행"):
         X = data[independent_vars].apply(pd.to_numeric, errors='coerce').dropna()
         y = pd.to_numeric(data[target_var], errors='coerce').loc[X.index].dropna()
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         model = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
         model.fit(X_train, y_train)
 
