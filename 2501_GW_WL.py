@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import numpy as np
 
 # 📂 파일 업로드 및 데이터 로딩
@@ -46,29 +46,34 @@ if uploaded_file or use_default:
         data = load_data(uploaded_file)
     else:
         data = load_default_data()
-
-    # 🧹 전처리: WaterDepth > threshold 필터링
-    if '계측수위' in data.columns:
-        data = data[data['계측수위'] > water_depth_threshold].sort_values('Datetime').reset_index(drop=True)
-        st.success(f"✅ 수위 {water_depth_threshold}m 이하 데이터를 제거하였습니다.")
+    
+    # '계측수위' 컬럼 자동 탐지
+    possible_wl_columns = [col for col in data.columns if '수위' in col or 'WL' in col]
+    if possible_wl_columns:
+        wl_column = possible_wl_columns[0]
+        data = data[data[wl_column] > water_depth_threshold].sort_values('Datetime').reset_index(drop=True)
+        st.success(f"✅ 수위 {water_depth_threshold}m 이하 데이터를 제거하였습니다. (사용 컬럼: {wl_column})")
+    else:
+        st.error("❌ 데이터에 '수위' 또는 'WL' 관련 컬럼이 없습니다. 업로드한 데이터를 확인하세요.")
+        st.stop()
 
     with st.expander("🔍 Raw 데이터 보기", expanded=False):
         st.write(data)
         st.write(f"📋 **데이터 컬럼명:** {list(data.columns)}")
-
+    
     # 📌 독립변수 선택
     st.subheader("📈 독립변수 선택")
-    independent_vars = st.multiselect("✅ 사용할 독립변수 선택:", options=list(data.columns), default=[col for col in ["수온", "전도도", "계측수위"] if col in data.columns])
+    independent_vars = st.multiselect("✅ 사용할 독립변수 선택:", options=list(data.columns), default=[col for col in ["수온", "전도도", wl_column] if col in data.columns])
 
     # 🎯 예측변수 선택
     st.subheader("🎯 예측변수 선택")
-    target_var = st.selectbox("✅ 예측할 변수 선택:", options=list(data.columns), index=list(data.columns).index("계측수위") if "계측수위" in data.columns else 0)
+    target_var = st.selectbox("✅ 예측할 변수 선택:", options=list(data.columns), index=list(data.columns).index(wl_column))
 
     # 🤖 모델 학습 및 예측
     if st.button("📊 모델 실행"):
         X = data[independent_vars].apply(pd.to_numeric, errors='coerce').dropna()
         y = pd.to_numeric(data[target_var], errors='coerce').loc[X.index].dropna()
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
         model = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
         model.fit(X_train, y_train)
 
@@ -81,26 +86,22 @@ if uploaded_file or use_default:
         test_r2 = r2_score(y_test, y_pred)
 
         # 📊 결과 시각화
-        fig, axes = plt.subplots(1, 3, figsize=(24, 8))
+        fig, axes = plt.subplots(1, 3, figsize=(24, 6))
+        axes[0].plot(y_train.values, label='실제값', linewidth=2)
+        axes[0].plot(y_train_pred, label='예측값', linestyle='--', linewidth=2)
+        axes[0].set_title(f'Training Set\nRMSE: {train_rmse:.2f}, R2: {train_r2:.2f}')
+        axes[0].legend()
 
-        # 📈 학습 데이터 시각화
-        axes[0].plot(y_train.values, label='실제값', linewidth=3)
-        axes[0].plot(y_train_pred, label='예측값', linestyle='--', linewidth=3)
-        axes[0].set_title(f'Training Set\nRMSE: {train_rmse:.2f}, R²: {train_r2:.2f}', fontsize=18)
-        axes[0].legend(fontsize=14)
+        axes[1].plot(y_test.values, label='실제값', linewidth=2)
+        axes[1].plot(y_pred, label='예측값', linestyle='--', linewidth=2)
+        axes[1].set_title(f'Testing Set\nRMSE: {test_rmse:.2f}, R2: {test_r2:.2f}')
+        axes[1].legend()
 
-        # 📈 테스트 데이터 시각화
-        axes[1].plot(y_test.values, label='실제값', linewidth=3)
-        axes[1].plot(y_pred, label='예측값', linestyle='--', linewidth=3)
-        axes[1].set_title(f'Testing Set\nRMSE: {test_rmse:.2f}, R²: {test_r2:.2f}', fontsize=18)
-        axes[1].legend(fontsize=14)
-
-        # 📉 실제값 vs 예측값 산점도
         axes[2].scatter(y_test, y_pred, alpha=0.6, edgecolor='k')
         axes[2].plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], 'r--')
-        axes[2].set_title(f'Actual vs Predicted\nR²: {test_r2:.2f}', fontsize=18)
-        axes[2].set_xlabel('Actual', fontsize=14)
-        axes[2].set_ylabel('Predicted', fontsize=14)
+        axes[2].set_title(f'Actual vs Predicted\nR2: {test_r2:.2f}')
+        axes[2].set_xlabel('Actual')
+        axes[2].set_ylabel('Predicted')
 
         st.pyplot(fig)
 else:
