@@ -111,6 +111,6 @@ else:
     st.info("💡 **K-water AI LAB x Groundwater Research Team Collaboration.**")
     col1, col2 = st.columns(2)
     with col1:
-        st.image("fig1.png", caption="📍 위치도 및 염분 분포도")
+        st.image("FIG2.png")
     with col2:
-        st.video("media.mp4")
+        st.video("media.mp4", caption="📍 위치도 및 염분 분포도")
