@@ -48,7 +48,10 @@ if uploaded_file or use_default:
     wl_column = '계측수위'
     if wl_column in data.columns:
         data = data.sort_values(wl_column).reset_index(drop=True)
-        st.success(f"✅ 사용 컬럼: {wl_column}")
+        with st.expander("🔍 Raw 데이터 보기", expanded=False):
+    st.success(f"✅ 사용 컬럼 (Raw Data): {wl_column}")
+    st.write(data)
+    st.write(f"📋 **데이터 컬럼명:** {list(data.columns)}")
     else:
         st.error("❌ 데이터에 '계측수위' 컬럼이 없습니다. 업로드한 데이터를 확인하세요.")
         st.stop()
