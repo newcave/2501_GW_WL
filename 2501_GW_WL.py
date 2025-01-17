@@ -44,7 +44,7 @@ if uploaded_file or use_default:
         st.write(data)
         st.write(f"📋 **데이터 컬럼명:** {list(data.columns)}")
     
-    # 📌 독립변수 선택 (데이터 컬럼 기반)
+    # 📌 독립변수 선택 (기본값: EC, Temperature, WL)
     st.subheader("📈 독립변수 선택")
     independent_vars = st.multiselect(
         "✅ 사용할 독립변수 선택:",
@@ -52,12 +52,12 @@ if uploaded_file or use_default:
         default=[col for col in ["EC", "Temperature", "WL"] if col in data.columns]
     )
     
-    # 🎯 예측변수 선택
+    # 🎯 예측변수 선택 (기본값: WL)
     st.subheader("🎯 예측변수 선택")
     target_var = st.selectbox(
         "✅ 예측할 변수 선택:",
         options=list(data.columns),
-        index=0
+        index=list(data.columns).index("WL") if "WL" in data.columns else 0
     )
     
     # 🔒 변수 설정 완료 버튼 추가
