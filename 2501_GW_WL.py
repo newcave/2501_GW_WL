@@ -8,17 +8,15 @@ import numpy as np
 # 📂 파일 업로드 및 데이터 로딩
 @st.cache_data
 def load_data(file):
-    data = pd.read_excel(file, header=1)  # 두 번째 행을 컬럼명으로 사용
+    data = pd.read_excel(file, header=2)  # 세 번째 행을 컬럼명으로 사용
     data.columns = data.columns.str.strip()  # 공백 제거
-    data.columns = [col if not col.startswith("Unnamed") else f"컬럼_{i}" for i, col in enumerate(data.columns)]  # Unnamed 처리
     return data
 
 # 📄 기본 파일 로딩 함수
 @st.cache_data
 def load_default_data():
-    data = pd.read_excel("GW_001.xlsx", header=1)  # 두 번째 행을 컬럼명으로 사용
+    data = pd.read_excel("GW_001.xlsx", header=2)  # 세 번째 행을 컬럼명으로 사용
     data.columns = data.columns.str.strip()  # 공백 제거
-    data.columns = [col if not col.startswith("Unnamed") else f"컬럼_{i}" for i, col in enumerate(data.columns)]  # Unnamed 처리
     return data
 
 # ⚙️ 사이드바 설정
