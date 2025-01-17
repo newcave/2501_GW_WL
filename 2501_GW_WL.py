@@ -102,6 +102,6 @@ else:
     # 📊 초기 화면 레이아웃 설정
     col1, col2 = st.columns(2)
     with col1:
-        st.image("/mnt/data/Figure1.png", caption="📍 위치도 및 염분 분포도")
+        st.image("fig1.png")
     with col2:
-        st.video("/mnt/data/media.mp4")
+        st.video("media.mp4", caption="📍 위치도 및 염분 분포도")
