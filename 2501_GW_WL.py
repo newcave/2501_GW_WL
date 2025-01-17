@@ -98,3 +98,10 @@ if uploaded_file or use_default:
             st.line_chart(pd.DataFrame({"✅ 실제값": y_test.values, "📈 예측값": y_pred}, index=y_test.index))
 else:
     st.info("💡 **K-water AI LAB x Groundwater Research Team Collaboration.**")
+
+    # 📊 초기 화면 레이아웃 설정
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image("/mnt/data/Figure1.png", caption="📍 위치도 및 염분 분포도")
+    with col2:
+        st.video("/mnt/data/media.mp4")
