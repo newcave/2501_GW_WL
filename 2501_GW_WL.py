@@ -44,14 +44,13 @@ if uploaded_file or use_default:
     else:
         data = load_default_data()
     
-    # '계측수위' 컬럼 자동 탐지
-    possible_wl_columns = [col for col in data.columns if '수위' in col or 'WL' in col]
-    if possible_wl_columns:
-        wl_column = possible_wl_columns[0]
-        data = data.sort_values('Datetime').reset_index(drop=True)
+    # '계측수위' 컬럼 고정 사용
+    wl_column = '계측수위'
+    if wl_column in data.columns:
+        data = data.sort_values(wl_column).reset_index(drop=True)
         st.success(f"✅ 사용 컬럼: {wl_column}")
     else:
-        st.error("❌ 데이터에 '수위' 또는 'WL' 관련 컬럼이 없습니다. 업로드한 데이터를 확인하세요.")
+        st.error("❌ 데이터에 '계측수위' 컬럼이 없습니다. 업로드한 데이터를 확인하세요.")
         st.stop()
 
     with st.expander("🔍 Raw 데이터 보기", expanded=False):
@@ -70,7 +69,7 @@ if uploaded_file or use_default:
     if st.button("📊 모델 실행"):
         X = data[independent_vars].apply(pd.to_numeric, errors='coerce').dropna()
         y = pd.to_numeric(data[target_var], errors='coerce').loc[X.index].dropna()
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
         model = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
         model.fit(X_train, y_train)
 
