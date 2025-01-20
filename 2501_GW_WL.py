@@ -109,8 +109,8 @@ else:
     st.info("💡 **K-water AI LAB x Groundwater Research Team Collaboration.**")
     col1, col2 = st.columns(2)
     with col1:
-        st.image("FIG2.png", caption="📍 분석 개념도")
-        st.markdown("** 주요관측정 자료 기반 예측 수행**")
+        st.image("FIG2.png", caption="✅분석 개념도✅")
+        st.markdown("    ** 주요관측정 자료 기반 예측 수행**")
     with col2:
         st.video("media.mp4")
         st.markdown("📍 위치도 및 염분 분포도")
