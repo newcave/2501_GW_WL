@@ -27,6 +27,7 @@ uploaded_file = st.sidebar.file_uploader("📤 지점 데이터 업로드 (Excel
 lead_time = st.sidebar.slider("⏳ 리드 타임 (예측 기간, 일)", min_value=1, max_value=30, value=7)
 look_back = st.sidebar.slider("🔍 룩백 기간 (과거 데이터 사용 기간, 일)", min_value=1, max_value=365, value=30)
 n_estimators = st.sidebar.slider("🛠️ # of Estimators (하이퍼파라미터)", min_value=10, max_value=500, step=10, value=100)
+split_ratio = st.sidebar.slider("📊 학습:테스트 셋 비율 (%)", min_value=10, max_value=90, value=80, step=5)
 
 # 📊 데이터 로딩 및 출력
 if uploaded_file or use_default:
@@ -60,7 +61,7 @@ if uploaded_file or use_default:
             st.write(f"✅ **선택한 독립변수:** {independent_vars}")
             st.write(f"🎯 **예측 변수:** {target_var}")
             st.write(f"⏳ **리드 타임:** {lead_time}일, 🔍 **룩백 기간:** {look_back}일, 🛠️ **Estimator 수:** {n_estimators}")
-        
+        split_ratio = st.sidebar.slider("📊 학습:테스트 셋 비율 (%)", min_value=10, max_value=90, value=80, step=5)
         st.subheader("🔎 기본 EDA")
         fig, axes = plt.subplots(1, 3, figsize=(18, 5))
         for i, var in enumerate(independent_vars[:3]):
@@ -74,9 +75,14 @@ if uploaded_file or use_default:
         st.pyplot(fig_corr)
 
     if st.button("📊 모델 실행"):
+        test_size = 1 - (split_ratio / 100)  # 학습 비율을 테스트 비율로 변환
         X = data[independent_vars].apply(pd.to_numeric, errors='coerce').dropna()
         y = pd.to_numeric(data[target_var], errors='coerce').loc[X.index].dropna()
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+#    if st.button("📊 모델 실행"):
+#        X = data[independent_vars].apply(pd.to_numeric, errors='coerce').dropna()
+#        y = pd.to_numeric(data[target_var], errors='coerce').loc[X.index].dropna()
+#        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
         model = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
         model.fit(X_train, y_train)
         
