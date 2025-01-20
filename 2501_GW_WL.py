@@ -91,13 +91,13 @@ if uploaded_file or use_default:
         train_r2, test_r2 = r2_score(y_train, y_train_pred), r2_score(y_test, y_pred)
 
         fig, axes = plt.subplots(1, 3, figsize=(24, 6))
-        axes[0].plot(y_train.values, label='실제값')
-        axes[0].plot(y_train_pred, label='예측값', linestyle='--')
+        axes[0].plot(y_train.values, label='Actual')
+        axes[0].plot(y_train_pred, label='Predicted', linestyle='--')
         axes[0].set_title(f'Training Set\nRMSE: {train_rmse:.2f}, R2: {train_r2:.2f}')
         axes[0].legend()
 
-        axes[1].plot(y_test.values, label='실제값')
-        axes[1].plot(y_pred, label='예측값', linestyle='--')
+        axes[1].plot(y_test.values, label='Actual')
+        axes[1].plot(y_pred, label='Predicted', linestyle='--')
         axes[1].set_title(f'Testing Set\nRMSE: {test_rmse:.2f}, R2: {test_r2:.2f}')
         axes[1].legend()
 
@@ -109,6 +109,6 @@ else:
     st.info("💡 **K-water AI LAB x Groundwater Research Team Collaboration.**")
     col1, col2 = st.columns(2)
     with col1:
-        st.image("FIG2.png", caption="📍 위치도 및 염분 분포도")
+        st.image("FIG2.png")
     with col2:
-        st.video("media.mp4")
+        st.video("media.mp4", caption="📍 위치도 및 염분 분포도")
