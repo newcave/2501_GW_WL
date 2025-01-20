@@ -44,7 +44,7 @@ if uploaded_file or use_default:
         st.write(f"📋 **데이터 컬럼명:** {list(data.columns)}")
 
     st.subheader("📈 독립변수 선택")
-    independent_vars = st.multiselect("✅ 사용할 독립변수 선택:", options=list(data.columns), default=[col for col in ["수온", "전도도", wl_column] if col in data.columns])
+    independent_vars = st.multiselect("✅ 사용할 독립변수 선택:", options=list(data.columns), default=[col for col in ["수온", "전도도"] if col in data.columns])
     st.subheader("🎯 예측변수 선택")
     target_var = st.selectbox("✅ 예측할 변수 선택:", options=list(data.columns), index=list(data.columns).index(wl_column))
 
