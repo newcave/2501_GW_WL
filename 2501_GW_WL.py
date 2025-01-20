@@ -113,4 +113,4 @@ else:
         st.markdown("<h6 style='text-align: center;'> **주요관측정 자료 기반 예측 수행** </h6>", unsafe_allow_html=True)
     with col2:
         st.video("media.mp4")
-        st.markdown("📍 위치도 및 염분 분포도")
+        st.markdown("📍 위치도 및 지표수 염분 분포도")
