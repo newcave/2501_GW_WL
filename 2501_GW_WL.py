@@ -112,9 +112,5 @@ else:
         st.image("FIG2.png", caption="✅ Analysis Concept Figure ✅")
         st.markdown("<h6 style='text-align: center;'> **주요관측정 자료 기반 예측 수행** </h6>", unsafe_allow_html=True)
     with col2:
-        st.markdown("""
-            <video width="100%" autoplay loop muted controls>
-                <source src="media.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-            <p style="text-align: center;">📍 위치도 및 염분 분포도</p>""", unsafe_allow_html=True)
+     st.video("media.mp4")
+        st.markdown("📍 위치도 및 염분 분포도")
