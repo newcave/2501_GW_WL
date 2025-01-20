@@ -61,7 +61,7 @@ if uploaded_file or use_default:
             st.write(f"✅ **선택한 독립변수:** {independent_vars}")
             st.write(f"🎯 **예측 변수:** {target_var}")
             st.write(f"⏳ **리드 타임:** {lead_time}일, 🔍 **룩백 기간:** {look_back}일, 🛠️ **Estimator 수:** {n_estimators}")
-        split_ratio = st.sidebar.slider("📊 학습:테스트 셋 비율 (%)", min_value=10, max_value=90, value=80, step=5)
+#        split_ratio = st.sidebar.slider("📊 학습:테스트 셋 비율 (%)", min_value=10, max_value=90, value=80, step=5)
         st.subheader("🔎 기본 EDA")
         fig, axes = plt.subplots(1, 3, figsize=(18, 5))
         for i, var in enumerate(independent_vars[:3]):
