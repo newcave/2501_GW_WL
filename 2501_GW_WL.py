@@ -27,7 +27,7 @@ uploaded_file = st.sidebar.file_uploader("📤 지점 데이터 업로드 (Excel
 lead_time = st.sidebar.slider("⏳ 리드 타임 (예측 기간, 일)", min_value=1, max_value=30, value=7)
 look_back = st.sidebar.slider("🔍 룩백 기간 (과거 데이터 사용 기간, 일)", min_value=1, max_value=365, value=30)
 n_estimators = st.sidebar.slider("🛠️ # of Estimators (하이퍼파라미터)", min_value=10, max_value=500, step=10, value=100)
-split_ratio = st.sidebar.slider("📊 학습:테스트 셋 비율 (%)", min_value=10, max_value=90, value=80, step=5)
+split_ratio = st.sidebar.slider("📊 학습:테스트 셋 비율 (%)", min_value=60, max_value=100, value=95, step=5)
 
 # 📊 데이터 로딩 및 출력
 if uploaded_file or use_default:
